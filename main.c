@@ -17,7 +17,7 @@
 
 void execute(char *command, char *av, char **env, int count)
 {
-	char **argv = malloc(5 * sizeof(char *));
+	char **argv;
 
 	argv = strtokarray(command, " ");
 	argv[0] = trim(argv[0]);
@@ -52,12 +52,7 @@ void shell_interactive(char *av, char **env)
 		count++;
 		child = fork();
 		if (strcmp(line, "exit\n") == 0)
-		{
-			if (count == 1)
-				exit(0);
-			else
-				exit(127);
-		}
+			exit(WEXITSTATUS(status));
 		else if (child == 0 && strcmp(line, "pwd\n") == 0)
 		{
 			if (getcwd(cwd, sizeof(cwd)) != NULL)
@@ -68,9 +63,7 @@ void shell_interactive(char *av, char **env)
 		else if (child == 0 && strcmp(line, "env\n") == 0)
 		{
 			while (env[i] != NULL)
-			{
 				printf("%s\n", env[i++]);
-			}
 			exit(0);
 		}
 		if (child == 0 && strcmp(line, "pwd\n") != 0)
@@ -80,9 +73,7 @@ void shell_interactive(char *av, char **env)
 			break;
 		}
 		else
-		{
 			wait(&status);
-		}
 		printf("($) ");
 	}
 	free(line);
