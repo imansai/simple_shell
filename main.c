@@ -15,7 +15,6 @@
 
 void execute(char *command, char **env)
 {
-	int i = 0;
 	char **argv = malloc(2 * sizeof(char *));
 	int len = strlen(command);
 
@@ -36,13 +35,13 @@ void execute(char *command, char **env)
 
 void shell_interactive(char **env)
 {
-	char *line = NULL;
+	char *line = "";
 	size_t size = 0;
 	pid_t child;
 	int status;
 
 	printf("($) ");
-	while (line != "exit\n")
+	while (strcmp(line, "exit\n") != 0)
 	{
 		child = fork();
 		if (child == 0)
@@ -70,7 +69,6 @@ void shell_nonint(char **env)
 {
 	char *line = NULL;
 	size_t size = 0;
-	int status;
 
 	getline(&line, &size, stdin);
 	execute(line, env);
@@ -87,6 +85,10 @@ void shell_nonint(char **env)
 
 int main(int ac, char **av, char **env)
 {
+	int i = 0;
+
+	while (i != ac)
+		(void)av[i++];
 	if (isatty(0))
 		shell_interactive(env);
 	else
