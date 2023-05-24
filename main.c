@@ -51,17 +51,14 @@ void shell_interactive(char *av, char **env)
 		if (strcmp(line, "exit\n") == 0)
 		{
 			exit(2);
+			break;
 		}
 		else if (child == 0 && strcmp(line, "pwd\n") == 0)
 		{
 			if (getcwd(cwd, sizeof(cwd)) != NULL)
-			{
 				printf("%s\n", cwd);
-			}
 			else
-			{
 				perror("getcwd() error");
-			}
 		}
 		if (child == 0 && strcmp(line, "pwd\n") != 0)
 		{
@@ -101,6 +98,7 @@ void shell_nonint(char *av, char **env)
 		if (strcmp(line, "exit\n") == 0)
 		{
 			exit(2);
+			break;
 		}
 		else if (child == 0 && strcmp(line, "pwd\n") == 0)
 		{
