@@ -33,13 +33,6 @@ void execute(char *command, char *av, char **env, int count)
 				exit(127);
 			}
 		}
-		if (strcmp(argv[0], "exit") == 0)
-		{
-			if (argv[1] != NULL && argv[2] == NULL)
-				exit(atoi(argv[1]));
-			else
-				exit(0);
-		}
 		else
 		{
 			if (execve(argv[0], argv, env) == -1)
@@ -75,8 +68,8 @@ void shell_interactive(char *av, char **env)
 		checkpwd = strcmp(line, "pwd\n");
 		count++;
 		child = fork();
-		if (strncmp(line, "exit", 4) == 0)
-			execute(line, av, env, count);
+		if (checkexit == 0)
+			(count > 1) ? exit(EXIT_SUCCESS) : exit(EXIT_FAILURE);
 		if (child == 0 && strcmp(line, "pwd\n") == 0)
 		{
 			if (getcwd(cwd, sizeof(cwd)) != NULL)
@@ -123,8 +116,9 @@ void shell_nonint(char *av, char **env)
 		checkpwd = strcmp(line, "pwd\n");
 		count++;
 		child = fork();
-		if (strncmp(line, "exit", 4) == 0)
-			execute(line, av, env, count);
+		if (checkexit == 0)
+			(count > 1) ? exit(EXIT_SUCCESS) : exit(EXIT_FAILURE);
+
 		if (child == 0 && strcmp(line, "pwd\n") == 0)
 		{
 			if (getcwd(cwd, sizeof(cwd)) != NULL)
