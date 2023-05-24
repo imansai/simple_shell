@@ -30,7 +30,7 @@ void execute(char *command, char *av, char **env, int count)
 			if (execve("/bin/env", argv, env) == -1)
 			{
 				printf("%s: %d: %s: not found\n", av, count, argv[0]);
-				exit(127);
+				exit(EXIT_FAILURE);
 			}
 		}
 		else
@@ -38,7 +38,7 @@ void execute(char *command, char *av, char **env, int count)
 			if (execve(argv[0], argv, env) == -1)
 			{
 				printf("%s: %d: %s: not found\n", av, count, argv[0]);
-				exit(127);
+				exit(EXIT_FAILURE);
 			}
 		}
 	}
@@ -90,7 +90,7 @@ void shell_interactive(char *av, char **env)
 		printf("($) ");
 	}
 	putchar('\n');
-	exit(127);
+	exit(EXIT_FAILURE);
 }
 
 /**
