@@ -1,6 +1,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdbool.h>
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/wait.h>
@@ -20,11 +21,15 @@ void execute(char *command, char *av, char **env, int count)
 	char **argv;
 
 	argv = strtokarray(command, " \n\r\t");
-	printf("%s\n", argv[0]);
-	if (execve(argv[0], argv, env) == -1)
+	argv[0] = strtok(argv[0], " \n\r\t");
+
+	if (strcmp(argv[0], "(null)") != 0)
 	{
-		printf("%s: %d: %s: not found\n", av, count, argv[0]);
-		exit(127);
+		if (execve(argv[0], argv, env) == -1)
+		{
+			printf("%s: %d: %s: not found\n", av, count, argv[0]);
+			exit(127);
+		}
 	}
 }
 /**
@@ -44,6 +49,7 @@ void shell_interactive(char *av, char **env)
 	int checkpwd, checkexit, checkenv, status;
 
 	printf("($) ");
+
 	while (getline(&line, &size, stdin) != -1)
 	{
 		checkenv = strcmp(line, "env\n");
@@ -52,7 +58,7 @@ void shell_interactive(char *av, char **env)
 		count++;
 		child = fork();
 		if (checkexit == 0)
-			exit(WEXITSTATUS(status));
+			(count > 1) ? exit(WEXITSTATUS(status)) : exit(0);
 		if (child == 0 && strcmp(line, "pwd\n") == 0)
 		{
 			if (getcwd(cwd, sizeof(cwd)) != NULL)
@@ -71,7 +77,8 @@ void shell_interactive(char *av, char **env)
 			wait(&status);
 		printf("($) ");
 	}
-	free(line);
+	putchar('\n');
+	exit(127);
 }
 
 /**
@@ -86,39 +93,35 @@ void shell_nonint(char *av, char **env)
 	char *line = NULL;
 	size_t size = 0;
 	pid_t child;
-	int status;
 	int count = 0;
 	char cwd[1024];
+	int checkpwd, checkexit, checkenv, status;
 
 	while (getline(&line, &size, stdin) != -1)
 	{
+		checkenv = strcmp(line, "env\n");
+		checkexit = strcmp(line, "exit\n");
+		checkpwd = strcmp(line, "pwd\n");
 		count++;
 		child = fork();
-		if (strcmp(line, "exit\n") == 0)
-		{
-			break;
-		}
-		else if (child == 0 && strcmp(line, "pwd\n") == 0)
+		if (checkexit == 0)
+			(count > 1) ? exit(WEXITSTATUS(status)) : exit(0);
+		if (child == 0 && strcmp(line, "pwd\n") == 0)
 		{
 			if (getcwd(cwd, sizeof(cwd)) != NULL)
-			{
 				printf("%s\n", cwd);
-			}
 			else
-			{
 				perror("getcwd() error");
-			}
 		}
-		if (child == 0 && strcmp(line, "pwd\n") != 0)
+		if (child == 0 && checkenv == 0)
+			exit(0);
+		if (child == 0 && checkpwd != 0 && checkenv != 0 && checkexit != 0)
 		{
-
 			execute(line, av, env, count);
 			break;
 		}
 		else
-		{
 			wait(&status);
-		}
 	}
 	free(line);
 	exit(WEXITSTATUS(status));
