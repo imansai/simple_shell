@@ -19,10 +19,8 @@ void execute(char *command, char *av, char **env, int count)
 {
 	char **argv;
 
-	argv = strtokarray(command, " ");
-	argv[0] = trim(argv[0]);
-	_which(argv[0]);
-
+	argv = strtokarray(command, " \n\r\t");
+	printf("%s\n", argv[0]);
 	if (execve(argv[0], argv, env) == -1)
 	{
 		printf("%s: %d: %s: not found\n", av, count, argv[0]);
@@ -41,34 +39,31 @@ void shell_interactive(char *av, char **env)
 	char *line = "";
 	size_t size = 0;
 	pid_t child;
-	int status;
 	int count = 0;
 	char cwd[1024];
-	int i = 0;
+	int checkpwd, checkexit, checkenv, status;
 
 	printf("($) ");
 	while (getline(&line, &size, stdin) != -1)
 	{
+		checkenv = strcmp(line, "env\n");
+		checkexit = strcmp(line, "exit\n");
+		checkpwd = strcmp(line, "pwd\n");
 		count++;
 		child = fork();
-		if (strcmp(line, "exit\n") == 0)
+		if (checkexit == 0)
 			exit(WEXITSTATUS(status));
-		else if (child == 0 && strcmp(line, "pwd\n") == 0)
+		if (child == 0 && strcmp(line, "pwd\n") == 0)
 		{
 			if (getcwd(cwd, sizeof(cwd)) != NULL)
 				printf("%s\n", cwd);
 			else
 				perror("getcwd() error");
 		}
-		else if (child == 0 && strcmp(line, "env\n") == 0)
-		{
-			while (env[i] != NULL)
-				printf("%s\n", env[i++]);
+		if (child == 0 && checkenv == 0)
 			exit(0);
-		}
-		if (child == 0 && strcmp(line, "pwd\n") != 0)
+		if (child == 0 && checkpwd != 0 && checkenv != 0 && checkexit != 0)
 		{
-
 			execute(line, av, env, count);
 			break;
 		}
@@ -139,10 +134,7 @@ void shell_nonint(char *av, char **env)
 
 int main(int ac, char **av, char **env)
 {
-	int i = 0;
-
-	while (i != ac)
-		(void)av[i++];
+	(void)ac;
 	if (isatty(0))
 		shell_interactive(av[0], env);
 	else
