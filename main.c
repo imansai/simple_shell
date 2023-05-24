@@ -132,10 +132,10 @@ void shell_nonint(char *av, char **env)
 		else
 		{
 			wait(&status);
-			exit(WEXITSTATUS(status));
 		}
 	}
 	free(line);
+	exit(WEXITSTATUS(status));
 }
 
 /**
