@@ -69,7 +69,7 @@ void shell_interactive(char *av, char **env)
 		count++;
 		child = fork();
 		if (checkexit == 0)
-			(count > 1) ? exit(EXIT_SUCCESS) : exit(EXIT_FAILURE);
+			(count != 0) ? exit(WEXITSTATUS(status)) : exit(EXIT_SUCCESS);
 		if (child == 0 && strcmp(line, "pwd\n") == 0)
 		{
 			if (getcwd(cwd, sizeof(cwd)) != NULL)
@@ -117,7 +117,7 @@ void shell_nonint(char *av, char **env)
 		count++;
 		child = fork();
 		if (checkexit == 0)
-			(count > 1) ? exit(EXIT_SUCCESS) : exit(EXIT_FAILURE);
+			(count != 0) ? exit(WEXITSTATUS(status)) : exit(EXIT_SUCCESS);
 
 		if (child == 0 && strcmp(line, "pwd\n") == 0)
 		{
