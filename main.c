@@ -28,6 +28,7 @@ void execute(char *command, char *av, char **env, int count)
 		printf("%s: %d: %s: not found\n", av, count, argv[0]);
 		exit(127);
 	}
+	exit(0);
 }
 /**
  * shell_interactive - starts shell
@@ -52,18 +53,11 @@ void shell_interactive(char *av, char **env)
 		count++;
 		child = fork();
 		if (strcmp(line, "exit\n") == 0)
-		{
-			if (count == 1)
-				exit(0);
-			else
-				exit(127);
-		}
+			exit(WEXITSTATUS(status));
 		else if (child == 0 && strcmp(line, "pwd\n") == 0)
 		{
 			if (getcwd(cwd, sizeof(cwd)) != NULL)
 				printf("%s\n", cwd);
-			else
-				perror("getcwd() error");
 		}
 		else if (child == 0 && strcmp(line, "env\n") == 0)
 		{
@@ -75,9 +69,7 @@ void shell_interactive(char *av, char **env)
 		}
 		if (child == 0 && strcmp(line, "pwd\n") != 0)
 		{
-
 			execute(line, av, env, count);
-			break;
 		}
 		else
 		{
