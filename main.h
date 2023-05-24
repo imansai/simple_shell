@@ -6,4 +6,5 @@ void _which(char *str);
 void shell_nonint(char *av, char **env);
 void shell_interactive(char *av, char **env);
 void execute(char *command, char *av, char **env, int count);
+void printenv(char **env);
 #endif

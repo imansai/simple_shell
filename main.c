@@ -67,7 +67,7 @@ void shell_interactive(char *av, char **env)
 				perror("getcwd() error");
 		}
 		if (child == 0 && checkenv == 0)
-			exit(0);
+			printenv(env);
 		if (child == 0 && checkpwd != 0 && checkenv != 0 && checkexit != 0)
 		{
 			execute(line, av, env, count);
