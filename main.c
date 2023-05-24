@@ -25,6 +25,7 @@ void execute(char *command, char *av, char **env, int count)
 	if (execve(argv[0], argv, env) == -1)
 	{
 		printf("%s: %d: %s: not found\n", av, count, argv[0]);
+		exit(127);
 	}
 }
 /**
@@ -51,7 +52,7 @@ void shell_interactive(char *av, char **env)
 		if (strcmp(line, "exit\n") == 0)
 		{
 			if (count == 1)
-				break;
+				exit(0);
 			else
 				exit(127);
 		}
@@ -99,10 +100,7 @@ void shell_nonint(char *av, char **env)
 		child = fork();
 		if (strcmp(line, "exit\n") == 0)
 		{
-			if (count == 1)
-				break;
-			else
-				exit(2);
+			break;
 		}
 		else if (child == 0 && strcmp(line, "pwd\n") == 0)
 		{
@@ -124,6 +122,7 @@ void shell_nonint(char *av, char **env)
 		else
 		{
 			wait(&status);
+			exit(WEXITSTATUS(status));
 		}
 	}
 	free(line);
