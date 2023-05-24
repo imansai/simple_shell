@@ -3,7 +3,7 @@
 
 char **strtokarray(char *str);
 void _which(char *str);
-void shell_nonint(char **env);
-void shell_interactive(char **env);
-void execute(char *command, char **env);
+void shell_nonint(char *av, char **env);
+void shell_interactive(char *av, char **env);
+void execute(char *command, char *av, char **env, int count);
 #endif
