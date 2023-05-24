@@ -50,8 +50,7 @@ void shell_interactive(char *av, char **env)
 		child = fork();
 		if (strcmp(line, "exit\n") == 0)
 		{
-			_exit(2);
-			break;
+			exit(2);
 		}
 		else if (child == 0 && strcmp(line, "pwd\n") == 0)
 		{
@@ -97,8 +96,7 @@ void shell_nonint(char *av, char **env)
 		child = fork();
 		if (strcmp(line, "exit\n") == 0)
 		{
-			_exit(2);
-			break;
+			exit(0);
 		}
 		else if (child == 0 && strcmp(line, "pwd\n") == 0)
 		{
