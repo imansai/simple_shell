@@ -50,7 +50,7 @@ void shell_interactive(char *av, char **env)
 		child = fork();
 		if (strcmp(line, "exit\n") == 0)
 		{
-			exit(2);
+			break;
 		}
 		else if (child == 0 && strcmp(line, "pwd\n") == 0)
 		{
