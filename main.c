@@ -42,6 +42,7 @@ void shell_interactive(char *av, char **env)
 	int status;
 	int count = 0;
 	char cwd[1024];
+	char cwd[1024];
 
 	printf("($) ");
 	while (getline(&line, &size, stdin) != -1)
@@ -63,6 +64,18 @@ void shell_interactive(char *av, char **env)
 				perror("getcwd() error");
 			}
 		}
+		if (child == 0 && strcmp(line, "pwd\n") != 0)
+			else if (child == 0 && strcmp(line, "pwd\n") == 0)
+			{
+				if (getcwd(cwd, sizeof(cwd)) != NULL)
+				{
+					printf("%s\n", cwd);
+				}
+				else
+				{
+					perror("getcwd() error");
+				}
+			}
 		if (child == 0 && strcmp(line, "pwd\n") != 0)
 		{
 
@@ -115,7 +128,41 @@ void shell_nonint(char *av, char **env)
 		}
 		if (child == 0 && strcmp(line, "pwd\n") != 0)
 		{
+			pid_t child;
+			int status;
+			int count = 0;
+			char cwd[1024];
 
+			while (getline(&line, &size, stdin) != -1)
+			{
+				count++;
+				child = fork();
+				if (strcmp(line, "exit\n") == 0)
+				{
+					break;
+				}
+				else if (child == 0 && strcmp(line, "pwd\n") == 0)
+				{
+					if (getcwd(cwd, sizeof(cwd)) != NULL)
+					{
+						printf("%s\n", cwd);
+					}
+					else
+					{
+						perror("getcwd() error");
+					}
+				}
+				if (child == 0 && strcmp(line, "pwd\n") != 0)
+				{
+
+					execute(line, av, env, count);
+					_exit(0);
+				}
+				else
+				{
+					wait(&status);
+				}
+			}
 			execute(line, av, env, count);
 			_exit(0);
 		}
