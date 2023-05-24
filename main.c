@@ -67,7 +67,7 @@ void shell_interactive(char *av, char **env)
 		{
 
 			execute(line, av, env, count);
-			_exit(2);
+			_exit(0);
 		}
 		else
 		{
