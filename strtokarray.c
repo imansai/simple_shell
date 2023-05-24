@@ -14,16 +14,20 @@ char **strtokarray(char *str)
 	char **arr = malloc(sizeof(char *));
 	char *token;
 	int i = 0;
-
 	if (str == NULL)
 		return (NULL);
-	token = strtok(str, ":");
+	token = strtok(str, " ");
+
 	while (token != NULL)
 	{
 		arr = realloc(arr, (i + 1) * sizeof(char *));
 		arr[i] = malloc((strlen(token) + 1) * sizeof(char));
-		token = strtok(NULL, ":");
-		arr[i++] = token;
+		arr[i] = token;
+
+		token = strtok(NULL, " ");
+
+		i++;
 	}
+	arr[i] = NULL;
 	return (arr);
 }
