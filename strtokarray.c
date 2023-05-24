@@ -14,6 +14,7 @@ char **strtokarray(char *str)
 	char **arr = malloc(sizeof(char *));
 	char *token;
 	int i = 0;
+
 	if (str == NULL)
 		return (NULL);
 	token = strtok(str, " ");
