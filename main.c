@@ -19,8 +19,9 @@ void execute(char *command, char *av, char **env, int count)
 {
 	char **argv = malloc(5 * sizeof(char *));
 
-	argv = strtokarray(command);
+	argv = strtokarray(command, " ");
 	argv[0] = trim(argv[0]);
+	_which(argv[0]);
 
 	if (execve(argv[0], argv, env) == -1)
 	{
@@ -43,6 +44,7 @@ void shell_interactive(char *av, char **env)
 	int status;
 	int count = 0;
 	char cwd[1024];
+	int i = 0;
 
 	printf("($) ");
 	while (getline(&line, &size, stdin) != -1)
@@ -62,6 +64,14 @@ void shell_interactive(char *av, char **env)
 				printf("%s\n", cwd);
 			else
 				perror("getcwd() error");
+		}
+		else if (child == 0 && strcmp(line, "env\n") == 0)
+		{
+			while (env[i] != NULL)
+			{
+				printf("%s\n", env[i++]);
+			}
+			exit(0);
 		}
 		if (child == 0 && strcmp(line, "pwd\n") != 0)
 		{
