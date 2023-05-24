@@ -96,7 +96,7 @@ void shell_nonint(char *av, char **env)
 		child = fork();
 		if (strcmp(line, "exit\n") == 0)
 		{
-			exit(0);
+			break;
 		}
 		else if (child == 0 && strcmp(line, "pwd\n") == 0)
 		{
