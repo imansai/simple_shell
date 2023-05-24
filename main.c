@@ -25,10 +25,21 @@ void execute(char *command, char *av, char **env, int count)
 
 	if (strcmp(argv[0], "(null)") != 0)
 	{
-		if (execve(argv[0], argv, env) == -1)
+		if (strcmp(argv[0], "env") == 0)
 		{
-			printf("%s: %d: %s: not found\n", av, count, argv[0]);
-			exit(127);
+			if (execve("/bin/env", argv, env) == -1)
+			{
+				printf("%s: %d: %s: not found\n", av, count, argv[0]);
+				exit(127);
+			}
+		}
+		else
+		{
+			if (execve(argv[0], argv, env) == -1)
+			{
+				printf("%s: %d: %s: not found\n", av, count, argv[0]);
+				exit(127);
+			}
 		}
 	}
 }
@@ -67,7 +78,8 @@ void shell_interactive(char *av, char **env)
 				perror("getcwd() error");
 		}
 		if (child == 0 && checkenv == 0)
-			printenv(env);
+			execute(line, av, env, count);
+
 		if (child == 0 && checkpwd != 0 && checkenv != 0 && checkexit != 0)
 		{
 			execute(line, av, env, count);
@@ -114,7 +126,7 @@ void shell_nonint(char *av, char **env)
 				perror("getcwd() error");
 		}
 		if (child == 0 && checkenv == 0)
-			exit(0);
+			execute(line, av, env, count);
 		if (child == 0 && checkpwd != 0 && checkenv != 0 && checkexit != 0)
 		{
 			execute(line, av, env, count);
