@@ -68,7 +68,7 @@ void shell_interactive(char *av, char **env)
 		count++;
 		child = fork();
 		if (checkexit == 0)
-			exit(0);
+			break;
 		if (child == 0 && strcmp(line, "pwd\n") == 0)
 		{
 			if (getcwd(cwd, sizeof(cwd)) != NULL)
@@ -117,7 +117,7 @@ void shell_nonint(char *av, char **env)
 		count++;
 		child = fork();
 		if (checkexit == 0)
-			exit(0);
+			break;
 		if (child == 0 && strcmp(line, "pwd\n") == 0)
 		{
 			if (getcwd(cwd, sizeof(cwd)) != NULL)
