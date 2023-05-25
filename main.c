@@ -39,9 +39,10 @@ int execute(char *command, char *av, char **env, int count)
 		else if (strcmp(argv[0], "exit") == 0)
 			return (1);
 
-		if (execve(argv[0], argv, env) == -1)
+		else
 		{
-			printf("%s: %d: %s: not found\n", av, count, argv[0]);
+			if (execve(argv[0], argv, env) == -1)
+				printf("%s: %d: %s: not found\n", av, count, argv[0]);
 			return (0);
 		}
 	}
@@ -65,9 +66,9 @@ void shell_interactive(char *av, char **env)
 	printf("($) ");
 	while (getline(&line, &size, stdin) != 0)
 	{
+		clearerr(stdin);
 		if (feof(stdin) && line[0] == '\0')
 		{
-			clearerr(stdin);
 			putchar('\n');
 			exit(0);
 		}
@@ -106,35 +107,28 @@ void shell_nonint(char *av, char **env)
 	size_t size = 0;
 	pid_t child;
 	int count = 0;
-	char cwd[1024];
-	int checkpwd, checkexit, checknexit, status;
 	ssize_t result;
+	int status;
 
 	while ((result = getline(&line, &size, stdin)) != -1)
 	{
-		checknexit = strncmp(line, "exit ", 5);
-		checkexit = strcmp(line, "exit\n");
-		checkpwd = strcmp(line, "pwd\n");
-		count++;
-		child = fork();
-		if (checkexit == 0 || checknexit == 0)
-			break;
-		if (child == 0 && strcmp(line, "pwd\n") == 0)
-		{
-			if (getcwd(cwd, sizeof(cwd)) != NULL)
-				printf("%s\n", cwd);
-			else
-				perror("getcwd() error");
-		}
 
-		if (child == 0 && checkpwd != 0 && checkexit != 0)
+		count++;
+
+		child = fork();
+		if (child == 0)
 		{
-			execute(line, av, env, count);
+			if (execute(line, av, env, count) == 1)
+				exit(1);
 			free(line);
 			exit(0);
 		}
 		else
+		{
 			wait(&status);
+			if (WIFEXITED(status) && WEXITSTATUS(status) == 1)
+				exit(0);
+		}
 	}
 }
 
