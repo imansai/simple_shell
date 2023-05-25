@@ -57,17 +57,18 @@ void shell_interactive(char *av, char **env)
 	pid_t child;
 	int count = 0;
 	char cwd[1024];
-	int checkpwd, checkexit, status;
+	int checkpwd, checkexit, checknexit, status;
 
 	printf("($) ");
 	while (getline(&line, &size, stdin) != -1)
 	{
 
 		checkexit = strcmp(line, "exit\n");
+		checknexit = strncmp(line, "exit ", 5);
 		checkpwd = strcmp(line, "pwd\n");
 		count++;
 		child = fork();
-		if (checkexit == 0)
+		if (checkexit == 0 || checknexit == 0)
 			break;
 		if (child == 0 && strcmp(line, "pwd\n") == 0)
 		{
@@ -89,7 +90,6 @@ void shell_interactive(char *av, char **env)
 		}
 	}
 	free(line);
-	putchar('\n');
 	exit(0);
 }
 
@@ -107,16 +107,16 @@ void shell_nonint(char *av, char **env)
 	pid_t child;
 	int count = 0;
 	char cwd[1024];
-	int checkpwd, checkexit, status;
+	int checkpwd, checkexit, checknexit, status;
 
 	while (getline(&line, &size, stdin) != -1)
 	{
-
+		checknexit = strncmp(line, "exit ", 5);
 		checkexit = strcmp(line, "exit\n");
 		checkpwd = strcmp(line, "pwd\n");
 		count++;
 		child = fork();
-		if (checkexit == 0)
+		if (checkexit == 0 || checknexit == 0)
 			break;
 		if (child == 0 && strcmp(line, "pwd\n") == 0)
 		{
