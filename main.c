@@ -134,10 +134,7 @@ void shell_nonint(char *av, char **env)
 			wait(&status);
 	}
 	free(line);
-	if (count == 1)
-		exit(0);
-	else
-		WEXITSTATUS(status);
+	exit(0);
 }
 
 /**
