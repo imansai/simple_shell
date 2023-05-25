@@ -57,18 +57,18 @@ void shell_interactive(char *av, char **env)
 	pid_t child;
 	int count = 0;
 	char cwd[1024];
-	int checkpwd, checkexit, checkenv, status;
+	int checkpwd, checkexit, status;
 
 	printf("($) ");
 	while (getline(&line, &size, stdin) != -1)
 	{
-		checkenv = strcmp(line, "env\n");
+
 		checkexit = strcmp(line, "exit\n");
 		checkpwd = strcmp(line, "pwd\n");
 		count++;
 		child = fork();
 		if (checkexit == 0)
-			(count == 1) ? exit(0) : exit(127);
+			exit(EXIT_SUCCESS);
 		if (child == 0 && strcmp(line, "pwd\n") == 0)
 		{
 			if (getcwd(cwd, sizeof(cwd)) != NULL)
@@ -76,9 +76,8 @@ void shell_interactive(char *av, char **env)
 			else
 				perror("getcwd() error");
 		}
-		if (child == 0 && checkenv == 0)
-			execute(line, av, env, count);
-		if (child == 0 && checkpwd != 0 && checkenv != 0 && checkexit != 0)
+
+		if (child == 0 && checkpwd != 0 && checkexit != 0)
 		{
 			execute(line, av, env, count);
 			break;
@@ -87,8 +86,9 @@ void shell_interactive(char *av, char **env)
 			wait(&status);
 		printf("($) ");
 	}
+	free(line);
 	putchar('\n');
-	exit(EXIT_SUCCESS);
+	exit(WEXITSTATUS(status));
 }
 
 /**
@@ -105,17 +105,17 @@ void shell_nonint(char *av, char **env)
 	pid_t child;
 	int count = 0;
 	char cwd[1024];
-	int checkpwd, checkexit, checkenv, status;
+	int checkpwd, checkexit, status;
 
 	while (getline(&line, &size, stdin) != -1)
 	{
-		checkenv = strcmp(line, "env\n");
+
 		checkexit = strcmp(line, "exit\n");
 		checkpwd = strcmp(line, "pwd\n");
 		count++;
 		child = fork();
 		if (checkexit == 0)
-			(count == 1) ? exit(0) : exit(WEXITSTATUS(status));
+			exit(EXIT_SUCCESS);
 		if (child == 0 && strcmp(line, "pwd\n") == 0)
 		{
 			if (getcwd(cwd, sizeof(cwd)) != NULL)
@@ -123,9 +123,8 @@ void shell_nonint(char *av, char **env)
 			else
 				perror("getcwd() error");
 		}
-		if (child == 0 && checkenv == 0)
-			execute(line, av, env, count);
-		if (child == 0 && checkpwd != 0 && checkenv != 0 && checkexit != 0)
+
+		if (child == 0 && checkpwd != 0 && checkexit != 0)
 		{
 			execute(line, av, env, count);
 			break;
