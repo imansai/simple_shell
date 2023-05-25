@@ -89,11 +89,7 @@ void shell_interactive(char *av, char **env)
 			printf("($) ");
 		}
 	}
-	free(line);
-	if (count == 1)
-		exit(0);
-	else
-		WEXITSTATUS(status);
+	exit(0);
 }
 
 /**
