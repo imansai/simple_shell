@@ -41,7 +41,7 @@ int execute(char *command, char *av, char **env, int count)
 
 		else
 		{
-			if (execve(argv[0], argv, env) == -1)
+			if (execve(argv[0], argv, env) != 1)
 				printf("%s: %d: %s: not found\n", av, count, argv[0]);
 			return (0);
 		}
@@ -64,21 +64,16 @@ void shell_interactive(char *av, char **env)
 	int status;
 
 	printf("($) ");
-	while (getline(&line, &size, stdin) != 0)
+	while (getline(&line, &size, stdin) != -1)
 	{
+
 		clearerr(stdin);
-		if (feof(stdin) && line[0] == '\0')
-		{
-			putchar('\n');
-			exit(0);
-		}
 		count++;
 		child = fork();
 		if (child == 0)
 		{
 			if (execute(line, av, env, count) == 1)
 				exit(1);
-			free(line);
 			exit(0);
 		}
 		else
@@ -91,6 +86,8 @@ void shell_interactive(char *av, char **env)
 		}
 	}
 	free(line);
+	putchar('\n');
+	line = "";
 	exit(0);
 }
 
