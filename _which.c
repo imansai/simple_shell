@@ -15,11 +15,10 @@ void _which(char *str)
 	int i = 0;
 	char **arr = strtokarray(path, ":");
 
+	printf("%s\n", str);
 	while (arr[i] != NULL)
 	{
-		if (strcmp(arr[i++], str) == 0)
-		{
-			return;
-		}
+		printf("%s\n", arr[i]);
+		i++;
 	}
 }

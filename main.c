@@ -60,7 +60,6 @@ void shell_interactive(char *av, char **env)
 	int checkpwd, checkexit, checkenv, status;
 
 	printf("($) ");
-
 	while (getline(&line, &size, stdin) != -1)
 	{
 		checkenv = strcmp(line, "env\n");
@@ -69,12 +68,7 @@ void shell_interactive(char *av, char **env)
 		count++;
 		child = fork();
 		if (checkexit == 0)
-		{
-			if (count == 1)
-				exit(EXIT_SUCCESS);
-			else
-				exit(127);
-		}
+			(count == 1) ? exit(0) : exit(127);
 		if (child == 0 && strcmp(line, "pwd\n") == 0)
 		{
 			if (getcwd(cwd, sizeof(cwd)) != NULL)
@@ -84,7 +78,6 @@ void shell_interactive(char *av, char **env)
 		}
 		if (child == 0 && checkenv == 0)
 			execute(line, av, env, count);
-
 		if (child == 0 && checkpwd != 0 && checkenv != 0 && checkexit != 0)
 		{
 			execute(line, av, env, count);
@@ -94,7 +87,8 @@ void shell_interactive(char *av, char **env)
 			wait(&status);
 		printf("($) ");
 	}
-	exit(EXIT_FAILURE);
+	putchar('\n');
+	exit(EXIT_SUCCESS);
 }
 
 /**
@@ -121,12 +115,7 @@ void shell_nonint(char *av, char **env)
 		count++;
 		child = fork();
 		if (checkexit == 0)
-		{
-			if (count == 1)
-				exit(EXIT_SUCCESS);
-			else
-				exit(127);
-		}
+			(count == 1) ? exit(0) : exit(WEXITSTATUS(status));
 		if (child == 0 && strcmp(line, "pwd\n") == 0)
 		{
 			if (getcwd(cwd, sizeof(cwd)) != NULL)
