@@ -67,7 +67,6 @@ void shell_interactive(char *av, char **env)
 	while (getline(&line, &size, stdin) != -1)
 	{
 
-		clearerr(stdin);
 		count++;
 		child = fork();
 		if (child == 0)
@@ -86,6 +85,7 @@ void shell_interactive(char *av, char **env)
 		}
 		free(line);
 	}
+	free(line);
 	putchar('\n');
 	line = "";
 	exit(0);
