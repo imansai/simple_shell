@@ -84,8 +84,8 @@ void shell_interactive(char *av, char **env)
 			else
 				printf("($) ");
 		}
+		free(line);
 	}
-	free(line);
 	putchar('\n');
 	line = "";
 	exit(0);
