@@ -19,10 +19,12 @@
 void execute(char *command, char *av, char **env, int count)
 {
 	char **argv;
+	int i;
 
 	argv = strtokarray(command, " \n\r\t");
 	argv[0] = strtok(argv[0], " \n\r\t");
-
+	if (argv[0] == NULL)
+		exit(EXIT_FAILURE);
 	if (strcmp(argv[0], "(null)") != 0)
 	{
 		if (strcmp(argv[0], "env") == 0)
@@ -30,6 +32,7 @@ void execute(char *command, char *av, char **env, int count)
 			if (execve("/bin/env", argv, env) == -1)
 			{
 				printf("%s: %d: %s: not found\n", av, count, argv[0]);
+
 				exit(EXIT_FAILURE);
 			}
 		}
@@ -38,10 +41,13 @@ void execute(char *command, char *av, char **env, int count)
 			if (execve(argv[0], argv, env) == -1)
 			{
 				printf("%s: %d: %s: not found\n", av, count, argv[0]);
-				exit(EXIT_FAILURE);
 			}
 		}
 	}
+	for (i = 0; argv[i] != NULL; i++)
+		free(argv[i]);
+	free(argv);
+	free(command);
 }
 /**
  * shell_interactive - starts shell
@@ -52,7 +58,7 @@ void execute(char *command, char *av, char **env, int count)
 
 void shell_interactive(char *av, char **env)
 {
-	char *line = "";
+	char *line = NULL;
 	size_t size = 0;
 	pid_t child;
 	int count = 0;
@@ -62,14 +68,14 @@ void shell_interactive(char *av, char **env)
 	printf("($) ");
 	while (getline(&line, &size, stdin) != -1)
 	{
-
 		checkexit = strcmp(line, "exit\n");
-		checknexit = strncmp(line, "exit ", 5);
+		checknexit = strncmp(line, "exit ", 4);
 		checkpwd = strcmp(line, "pwd\n");
 		count++;
+		clearerr(stdin);
 		child = fork();
-		if (checkexit == 0 || checknexit == 0)
-			break;
+		if (checknexit == 0)
+			exit(0);
 		if (child == 0 && strcmp(line, "pwd\n") == 0)
 		{
 			if (getcwd(cwd, sizeof(cwd)) != NULL)
@@ -81,7 +87,7 @@ void shell_interactive(char *av, char **env)
 		if (child == 0 && checkpwd != 0 && checkexit != 0)
 		{
 			execute(line, av, env, count);
-			break;
+			exit(EXIT_SUCCESS);
 		}
 		else
 		{
@@ -89,6 +95,9 @@ void shell_interactive(char *av, char **env)
 			printf("($) ");
 		}
 	}
+	putchar('\n');
+	line = NULL;
+	free(line);
 	exit(0);
 }
 
@@ -116,7 +125,9 @@ void shell_nonint(char *av, char **env)
 		count++;
 		child = fork();
 		if (checkexit == 0 || checknexit == 0)
+		{
 			break;
+		}
 		if (child == 0 && strcmp(line, "pwd\n") == 0)
 		{
 			if (getcwd(cwd, sizeof(cwd)) != NULL)
