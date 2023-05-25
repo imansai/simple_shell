@@ -57,7 +57,7 @@ int execute(char *command, char *av, char **env, int count)
 
 void shell_interactive(char *av, char **env)
 {
-	char *line = "";
+	char *line = NULL;
 	size_t size = 0;
 	pid_t child;
 	int count = 0;
@@ -66,7 +66,6 @@ void shell_interactive(char *av, char **env)
 	printf("($) ");
 	while (getline(&line, &size, stdin) != -1)
 	{
-
 		count++;
 		child = fork();
 		if (child == 0)
@@ -83,9 +82,10 @@ void shell_interactive(char *av, char **env)
 			else
 				printf("($) ");
 		}
-		free(line);
+		if (line != NULL)
+			free(line);
+		line = NULL;
 	}
-	free(line);
 	putchar('\n');
 	line = "";
 	exit(0);
