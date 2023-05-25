@@ -90,7 +90,10 @@ void shell_interactive(char *av, char **env)
 		}
 	}
 	free(line);
-	exit(0);
+	if (count == 1)
+		exit(0);
+	else
+		WEXITSTATUS(status);
 }
 
 /**
@@ -135,7 +138,10 @@ void shell_nonint(char *av, char **env)
 			wait(&status);
 	}
 	free(line);
-	exit(0);
+	if (count == 1)
+		exit(0);
+	else
+		WEXITSTATUS(status);
 }
 
 /**
