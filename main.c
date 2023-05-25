@@ -73,7 +73,7 @@ void shell_interactive(char *av, char **env)
 			if (count == 1)
 				exit(EXIT_SUCCESS);
 			else
-				exit(EXIT_FAILURE);
+				exit(127);
 		}
 		if (child == 0 && strcmp(line, "pwd\n") == 0)
 		{
@@ -125,7 +125,7 @@ void shell_nonint(char *av, char **env)
 			if (count == 1)
 				exit(EXIT_SUCCESS);
 			else
-				exit(EXIT_FAILURE);
+				exit(127);
 		}
 		if (child == 0 && strcmp(line, "pwd\n") == 0)
 		{
