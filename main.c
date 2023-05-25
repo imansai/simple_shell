@@ -37,16 +37,12 @@ int execute(char *command, char *av, char **env, int count)
 				perror("getcwd() error");
 		}
 		else if (strcmp(argv[0], "exit") == 0)
-		{
 			return (1);
-		}
-		else
+
+		if (execve(argv[0], argv, env) == -1)
 		{
-			if (execve(argv[0], argv, env) == -1)
-			{
-				printf("%s: %d: %s: not found\n", av, count, argv[0]);
-				return (0);
-			}
+			printf("%s: %d: %s: not found\n", av, count, argv[0]);
+			return (0);
 		}
 	}
 	return (0);
@@ -69,36 +65,11 @@ void shell_interactive(char *av, char **env)
 	printf("($) ");
 	while (getline(&line, &size, stdin) != 0)
 	{
-		if (feof(stdin))
+		if (feof(stdin) && line[0] == '\0')
 		{
-
 			clearerr(stdin);
-			if (line[0] != '\0')
-			{
-
-				count++;
-
-				child = fork();
-				if (child == 0)
-				{
-					if (execute(line, av, env, count) == 1)
-						exit(1);
-					exit(0);
-				}
-				else
-				{
-					wait(&status);
-					if (WIFEXITED(status) && WEXITSTATUS(status) == 1)
-						exit(0);
-				}
-			}
-			else
-			{
-				putchar('\n');
-				exit(0);
-			}
-			printf("($) ");
-			continue;
+			putchar('\n');
+			exit(0);
 		}
 		count++;
 		child = fork();
