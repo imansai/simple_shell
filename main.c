@@ -71,14 +71,18 @@ void shell_interactive(char *av, char **env)
 	{
 		if (feof(stdin))
 		{
+
 			clearerr(stdin);
 			if (line[0] != '\0')
 			{
+
+				count++;
+
 				child = fork();
 				if (child == 0)
 				{
 					if (execute(line, av, env, count) == 1)
-						exit(0);
+						exit(1);
 					exit(0);
 				}
 				else
@@ -101,7 +105,7 @@ void shell_interactive(char *av, char **env)
 		if (child == 0)
 		{
 			if (execute(line, av, env, count) == 1)
-				exit(0);
+				exit(1);
 			free(line);
 			exit(0);
 		}
